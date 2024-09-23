@@ -1,0 +1,61 @@
+{
+	"$schema": "https://internect.info/lexicon-schema.json",
+	"lexicon": 1,
+	"id": "x.basa.translate",
+	"defs": {
+		"main": {
+			"type": "query",
+			"description": "Translates a given text into another language",
+			"parameters": {
+				"type": "params",
+				"required": ["to", "text"],
+				"properties": {
+					"engine": {
+						"type": "string",
+						"description": "Which translation service to use",
+						"enum": ["google", "deepl"],
+						"default": "google"
+					},
+					"from": {
+						"type": "string",
+						"description": "Source language",
+						"default": "auto"
+					},
+					"to": {
+						"type": "string",
+						"description": "Target language"
+					},
+					"text": {
+						"type": "string",
+						"description": "Text needing translation"
+					}
+				}
+			},
+			"output": {
+				"encoding": "application/json",
+				"schema": {
+					"type": "object",
+					"required": ["result"],
+					"properties": {
+						"result": {
+							"type": "string",
+							"description": "Translated text"
+						},
+						"sourceLanguage": {
+							"type": "string",
+							"description": "Deteced language from source text"
+						},
+						"sourceTransliteration": {
+							"type": "string",
+							"description": "Transliteration of source text"
+						},
+						"targetTransliteration": {
+							"type": "string",
+							"description": "Transliteration of translated text"
+						}
+					}
+				}
+			}
+		}
+	}
+}

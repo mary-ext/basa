@@ -1,0 +1,23 @@
+{
+	"name": "basa",
+	"module": "index.ts",
+	"type": "module",
+	"scripts": {
+		"fmt": "prettier --cache --write .",
+		"dev:bun": "bun --watch src/index.ts",
+		"dev:cf": "wrangler dev src/index.ts",
+		"deploy:cf": "wrangler deploy --minify src/index.ts",
+		"gen:atcute": "lex-cli generate lexicons/*.json -o lexicons.ts"
+	},
+	"dependencies": {
+		"@sinclair/typebox": "^0.33.12",
+		"elysia": "^1.1.13"
+	},
+	"devDependencies": {
+		"@atcute/client": "^2.0.1",
+		"@atcute/lex-cli": "1.0.2",
+		"@types/bun": "latest",
+		"prettier": "^3.3.3",
+		"wrangler": "^3.78.7"
+	}
+}

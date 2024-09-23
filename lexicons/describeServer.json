@@ -1,0 +1,50 @@
+{
+	"$schema": "https://internect.info/lexicon-schema.json",
+	"lexicon": 1,
+	"id": "x.basa.describeServer",
+	"defs": {
+		"main": {
+			"type": "query",
+			"description": "Describes the translation proxy instance",
+			"output": {
+				"encoding": "application/json",
+				"schema": {
+					"type": "object",
+					"required": ["engines"],
+					"properties": {
+						"engines": {
+							"type": "ref",
+							"ref": "#engines"
+						}
+					}
+				}
+			}
+		},
+		"engines": {
+			"type": "object",
+			"properties": {
+				"google": {
+					"type": "ref",
+					"ref": "#engine"
+				},
+				"deepl": {
+					"type": "ref",
+					"ref": "#engine"
+				}
+			}
+		},
+		"engine": {
+			"type": "object",
+			"required": ["languages"],
+			"properties": {
+				"languages": {
+					"type": "array",
+					"description": "Supported language codes",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	}
+}
