@@ -28,18 +28,45 @@ const routes = new Elysia().get(
 		return result;
 	},
 	{
+		detail: {
+			description: `Translates a given text into another language`,
+		},
 		query: t.Object({
-			engine: t.Enum(TranslateEngine),
-			from: t.Optional(t.String()),
-			to: t.String(),
-			text: t.String(),
+			engine: t.Enum(TranslateEngine, {
+				description: `Which translation service to use`,
+			}),
+			from: t.Optional(
+				t.String({
+					description: `Source language`,
+				}),
+			),
+			to: t.String({
+				description: `Target language`,
+			}),
+			text: t.String({
+				description: `Source text needing translation`,
+			}),
 		}),
 		response: {
 			200: t.Object({
-				result: t.String(),
-				sourceLanguage: t.Optional(t.String()),
-				sourceTransliteration: t.Optional(t.String()),
-				targetTransliteration: t.Optional(t.String()),
+				result: t.String({
+					description: `Resulting translation`,
+				}),
+				sourceLanguage: t.Optional(
+					t.String({
+						description: `Detected language of source text`,
+					}),
+				),
+				sourceTransliteration: t.Optional(
+					t.String({
+						description: `Transliteration of source text`,
+					}),
+				),
+				targetTransliteration: t.Optional(
+					t.String({
+						description: `Transliateration of translated text`,
+					}),
+				),
 			}),
 		},
 	},
