@@ -1,4 +1,4 @@
-import { InvalidRequestError, UpstreamFailureError } from '../errors.ts';
+import { InvalidRequestError, UpstreamFailureError } from '@atcute/xrpc-server';
 
 import type { TranslateResult } from './types.ts';
 
@@ -6,11 +6,15 @@ const RPC_URI = `https://translate.google.com/_/TranslateWebserverUi/data/batche
 
 export const translate = async (from: string, to: string, text: string): Promise<TranslateResult> => {
 	if (from !== 'auto' && !languages.includes(from)) {
-		throw new InvalidRequestError(`invalid source language; received=${from}`);
+		throw new InvalidRequestError({
+			description: `invalid source language; received=${from}`,
+		});
 	}
 
 	if (!languages.includes(to)) {
-		throw new InvalidRequestError(`invalid target language; received=${to}`);
+		throw new InvalidRequestError({
+			description: `invalid target language; received=${to}`,
+		});
 	}
 
 	const response = await fetch(RPC_URI, {
@@ -26,13 +30,17 @@ export const translate = async (from: string, to: string, text: string): Promise
 	});
 
 	if (!response.ok) {
-		throw new UpstreamFailureError(`service responded with non-ok; engine=google; status=${response.status}`);
+		throw new UpstreamFailureError({
+			description: `service responded with non-ok; engine=google; status=${response.status}`,
+		});
 	}
 
 	const txt = await response.text();
 
 	if (!txt.startsWith(")]}'\n\n")) {
-		throw new UpstreamFailureError(`service returned unexpected response format; engine=google`);
+		throw new UpstreamFailureError({
+			description: `service returned unexpected response format; engine=google`,
+		});
 	}
 
 	let json = JSON.parse(txt.slice(6));
@@ -54,7 +62,9 @@ export const translate = async (from: string, to: string, text: string): Promise
 			}
 		}
 
-		throw new UpstreamFailureError(`unexpected rpc response format; engine=google`);
+		throw new UpstreamFailureError({
+			description: `unexpected rpc response format; engine=google`,
+		});
 	}
 
 	// Read stuff
@@ -92,7 +102,9 @@ export const translate = async (from: string, to: string, text: string): Promise
 		};
 	} catch (err) {
 		console.error(err);
-		throw new UpstreamFailureError(`unexpected rpc response format`);
+		throw new UpstreamFailureError({
+			description: `unexpected rpc response format`,
+		});
 	}
 };
 

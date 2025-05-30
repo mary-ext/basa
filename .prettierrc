@@ -8,9 +8,16 @@
 	"bracketSpacing": true,
 	"overrides": [
 		{
-			"files": ["tsconfig.json", "jsconfig.json"],
+			"files": ["tsconfig.json", "tsconfig.*.json", "jsconfig.json"],
 			"options": {
 				"parser": "jsonc"
+			}
+		},
+		{
+			"files": ["*.md"],
+			"options": {
+				"printWidth": 100,
+				"proseWrap": "always"
 			}
 		}
 	]

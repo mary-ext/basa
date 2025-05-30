@@ -1,7 +1,6 @@
-import * as t from '@sinclair/typebox';
+import { InvalidRequestError, UpstreamFailureError } from '@atcute/xrpc-server';
 
-import { InvalidRequestError, UpstreamFailureError } from '../errors.ts';
-import { interpretSchema } from '../utils.ts';
+import * as v from 'valibot';
 
 import type { TranslateResult } from './types.ts';
 
@@ -42,74 +41,80 @@ const call = async (method: string, params: any): Promise<unknown> => {
 	});
 
 	if (response.status === 429) {
-		throw new UpstreamFailureError(`service ratelimit reached; engine=deepl`);
+		throw new UpstreamFailureError({
+			description: `service ratelimit reached; engine=deepl`,
+		});
 	}
 	if (!response.ok) {
-		throw new UpstreamFailureError(`service responded with non-ok; engine=deepl; status=${response.status}`);
+		throw new UpstreamFailureError({
+			description: `service responded with non-ok; engine=deepl; status=${response.status}`,
+		});
 	}
 
 	try {
 		const json = (await response.json()) as any;
 		return json.result;
 	} catch (err) {
-		throw new UpstreamFailureError(`failed to parse json; engine=deepl; status=${response.status}`);
+		throw new UpstreamFailureError({
+			description: `failed to parse json; engine=deepl; status=${response.status}`,
+		});
 	}
 };
 
-const SplitTextResponse = interpretSchema(
-	t.Object({
-		lang: t.Object({
-			detected: t.String(),
-			isConfident: t.Boolean(),
-			detectedLanguages: t.Record(t.String(), t.Number()),
+const SplitTextResponse = v.object({
+	lang: v.object({
+		detected: v.string(),
+		isConfident: v.boolean(),
+		detectedLanguages: v.record(v.string(), v.number()),
+	}),
+	texts: v.array(
+		v.object({
+			chunks: v.array(
+				v.object({
+					sentences: v.array(
+						v.object({
+							prefix: v.string(),
+							text: v.string(),
+						}),
+					),
+				}),
+			),
 		}),
-		texts: t.Array(
-			t.Object({
-				chunks: t.Array(
-					t.Object({
-						sentences: t.Array(
-							t.Object({
-								prefix: t.String(),
-								text: t.String(),
-							}),
-						),
-					}),
-				),
-			}),
-		),
-	}),
-);
+	),
+});
 
-const HandleJobsResponse = interpretSchema(
-	t.Object({
-		// target_lang: t.String(),
-		// source_lang: t.String(),
-		// source_lang_is_confident: t.Boolean(),
-		translations: t.Array(
-			t.Object({
-				// quality: t.String(),
-				beams: t.Array(
-					t.Object({
-						// num_symbols: t.Number(),
-						sentences: t.Array(
-							t.Object({
-								text: t.String(),
-							}),
-						),
-					}),
-				),
-			}),
-		),
-	}),
-);
+const HandleJobsResponse = v.object({
+	// target_lang: t.string(),
+	// source_lang: t.string(),
+	// source_lang_is_confident: t.boolean(),
+	translations: v.array(
+		v.object({
+			// quality: t.string(),
+			beams: v.array(
+				v.object({
+					// num_symbols: t.number(),
+					sentences: v.array(
+						v.object({
+							text: v.string(),
+						}),
+					),
+				}),
+			),
+		}),
+	),
+});
 
 export const translate = async (from: string, to: string, text: string): Promise<TranslateResult> => {
 	if (from !== 'auto' && !languages.includes(from)) {
-		throw new InvalidRequestError(`Invalid source language "${from}"`);
+		throw new InvalidRequestError({
+			description: `invalid source language "${from}"`,
+		});
 	}
 
 	if (!languages.includes(to)) {
-		throw new InvalidRequestError(`Invalid target language "${to}"`);
+		throw new InvalidRequestError({
+			description: `invalid target language "${to}"`,
+		});
 	}
 
 	const splits: unknown = await call('LMT_split_text', {
@@ -126,8 +131,10 @@ export const translate = async (from: string, to: string, text: string): Promise
 
 	console.log(JSON.stringify(splits));
 
-	if (!SplitTextResponse.Check(splits)) {
-		throw new UpstreamFailureError(`mismatching expected response; engine=deepl`);
+	if (!v.is(SplitTextResponse, splits)) {
+		throw new UpstreamFailureError({
+			description: `mismatching expected response; engine=deepl`,
+		});
 	}
 
 	const detected = from === 'auto' ? splits.lang.detected.toLowerCase() : undefined;
@@ -176,8 +183,10 @@ export const translate = async (from: string, to: string, text: string): Promise
 
 	console.log(JSON.stringify(result));
 
-	if (!HandleJobsResponse.Check(result)) {
-		throw new UpstreamFailureError(`mismatching expected response; engine=deepl`);
+	if (!v.is(HandleJobsResponse, result)) {
+		throw new UpstreamFailureError({
+			description: `mismatching expected response; engine=deepl`,
+		});
 	}
 
 	return {

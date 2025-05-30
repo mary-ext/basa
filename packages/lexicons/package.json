@@ -1,0 +1,35 @@
+{
+	"type": "module",
+	"name": "@kelinci/basa-lexicons",
+	"version": "1.0.0",
+	"description": "Basa schema defintitions",
+	"keywords": [
+		"atcute"
+	],
+	"license": "MIT",
+	"repository": {
+		"url": "https://github.com/mary-ext/basa",
+		"directory": "packages/lexicons"
+	},
+	"files": [
+		"dist/",
+		"lib/",
+		"!lib/**/*.bench.ts",
+		"!lib/**/*.test.ts"
+	],
+	"exports": {
+		".": "./dist/index.js",
+		"./types/*": "./dist/lexicons/types/x/basa/*.js"
+	},
+	"scripts": {
+		"build": "tsc --project tsconfig.build.json",
+		"generate": "rm -r ./lib/lexicons/; lex-cli generate -c ./lex.config.js",
+		"prepublish": "rm -rf dist; pnpm run build"
+	},
+	"dependencies": {
+		"@atcute/lexicons": "^1.0.4"
+	},
+	"devDependencies": {
+		"@atcute/lex-cli": "^2.1.0"
+	}
+}

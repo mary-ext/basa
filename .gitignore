@@ -12,3 +12,6 @@ yarn-*.log
 *.local
 
 tsconfig.tsbuildinfo
+
+.idea
+.DS_Store

@@ -1,0 +1,25 @@
+{
+	"private": true,
+	"type": "module",
+	"name": "@kelinci/basa-xrpc-server",
+	"version": "1.0.0",
+	"license": "MIT",
+	"repository": {
+		"url": "https://github.com/mary-ext/basa",
+		"directory": "packages/xrpc-server"
+	},
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types"
+	},
+	"dependencies": {
+		"@atcute/xrpc-server": "^0.1.1",
+		"@kelinci/basa-lexicons": "workspace:^",
+		"valibot": "^1.1.0"
+	},
+	"devDependencies": {
+		"wrangler": "^4.18.0"
+	}
+}
